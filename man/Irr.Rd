@@ -71,7 +71,8 @@ assemblages.matrix <- cbind(assemblage.1 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.3 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.4 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.5 = sample(c(0, 1), 50, replace = TRUE))
-rownames(assemblages.matrix) <- paste("sp", 1:50) # The order of row.names can be different between weights and assemblages
+rownames(assemblages.matrix) <- paste("sp", 1:50) # The order of row.names can
+                                # be different between weights and assemblages
 
 # Calculation of Irr
 Irr(assemblages.matrix, rarity.weights)
@@ -90,7 +91,8 @@ assemblages.matrix <- cbind(assemblage.1 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.3 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.4 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.5 = sample(c(0, 1), 50, replace = TRUE))
-rownames(assemblages.matrix) <- paste("sp", 1:50) # The order of row.names can be different between weights and assemblages
+rownames(assemblages.matrix) <- paste("sp", 1:50) # The order of row.names can 
+                                # be different between weights and assemblages
 
 # Calculation of Irr
 Irr(assemblages.matrix, rarity.weights)

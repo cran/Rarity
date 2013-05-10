@@ -280,9 +280,18 @@ setMethod("Irr",
               IrrValue <- 0
             } else
             {
-              IrrValue <- ((sum(assemblages * W) / sum(assemblages)) - Wmin) / (Wmax - Wmin)              
+              PA.assemblages <- assemblages
+              PA.assemblages[PA.assemblages > 0] <- 1
+              
+              if(abundance)
+              {
+                IrrValue <- ((sum(assemblages * W) / sum(assemblages)) - Wmin) / (Wmax - Wmin) # Formula with abundance
+              } else
+              {
+                IrrValue <- ((sum(PA.assemblages * W) / sum(PA.assemblages)) - Wmin) / (Wmax - Wmin) # Formula with presence-absence data       
+              }      
             }
-            return(c(Irr = IrrValue, Richness = sum(assemblages)))
+            return(c(Irr = IrrValue, Richness = sum(PA.assemblages)))
           }
           )
 
@@ -308,13 +317,23 @@ setMethod("Irr",
                               0)
               } else
               {
-                IrrValue <- c(IrrValue,
-                              ((sum(assemblages * W[, x1]) / sum(assemblages)) - Wmin[x1]) / (Wmax[x1] - Wmin[x1]))                     
+                PA.assemblages <- assemblages
+                PA.assemblages[PA.assemblages > 0] <- 1
+                
+                if(abundance)
+                {
+                  IrrValue <-  c(IrrValue,
+                                 ((sum(assemblages * W[, x1]) / sum(assemblages)) - Wmin[x1]) / (Wmax[x1] - Wmin[x1])) # Formula with abundance
+                } else
+                {
+                  IrrValue <-  c(IrrValue,
+                                 ((sum(PA.assemblages * W[, x1]) / sum(PA.assemblages)) - Wmin[x1]) / (Wmax[x1] - Wmin[x1])) # Formula with presence-absence data       
+                }   
               }
               names(IrrValue)[length(IrrValue)] <- paste("Irr_", colnames(W)[x1], sep ="")
             }
             IrrValue <- c(IrrValue,
-                          Richness = sum(assemblages))
+                          Richness = sum(PA.assemblages))
             return(IrrValue)
           }
           )
@@ -342,8 +361,18 @@ setMethod("Irr",
                               0)
               } else
               {
-                IrrValue <- c(IrrValue,
-                              ((sum(assemblages * W[, x1]) / sum(assemblages)) - Wmin[x1]) / (Wmax[x1] - Wmin[x1]))                     
+                PA.assemblages <- assemblages
+                PA.assemblages[PA.assemblages > 0] <- 1
+                
+                if(abundance)
+                {
+                  IrrValue <-  c(IrrValue,
+                                 ((sum(assemblages * W[, x1]) / sum(assemblages)) - Wmin[x1]) / (Wmax[x1] - Wmin[x1])) # Formula with abundance
+                } else
+                {
+                  IrrValue <-  c(IrrValue,
+                                 ((sum(PA.assemblages * W[, x1]) / sum(PA.assemblages)) - Wmin[x1]) / (Wmax[x1] - Wmin[x1])) # Formula with presence-absence data       
+                }                   
               }
               names(IrrValue)[length(IrrValue)] <- paste("Irr_", colnames(W)[x1], sep ="")
             }
@@ -366,19 +395,37 @@ setMethod("Irr",
               }
               W <- W[match(rownames(assemblages), names(W))]
             }
-
-            IrrValue <- apply(assemblages, 2, function(x, Weights, wmin, wmax)
-                          {
-                            if(sum(x) == 0)
-                            {
-                              0
-                            } else
-                            {
-                              (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
-                            }
-                          }, Weights = W, wmin = Wmin, wmax = Wmax)
+            PA.assemblages <- assemblages
+            PA.assemblages[PA.assemblages > 0] <- 1
+            
+            if(abundance)
+            {
+              IrrValue <- apply(assemblages, 2, function(x, Weights, wmin, wmax)
+              {
+                if(sum(x) == 0)
+                {
+                  0
+                } else
+                {
+                  (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                }
+              }, Weights = W, wmin = Wmin, wmax = Wmax) # Formula with abundance
+            } else
+            {
+              IrrValue <- apply(PA.assemblages, 2, function(x, pa, Weights, wmin, wmax)
+              {
+                if(sum(x) == 0)
+                {
+                  0
+                } else
+                {
+                  (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                }
+              }, Weights = W, wmin = Wmin, wmax = Wmax) # Formula with presence-absence data       
+            }
+            
             IrrValue <- cbind(IrrValue,
-                              Richness = apply(assemblages, 2, sum))
+                              Richness = apply(PA.assemblages, 2, sum))
             return(IrrValue)
           }
           )
@@ -397,24 +444,45 @@ setMethod("Irr",
               W <- W[match(rownames(assemblages), rownames(W)), ]
             }
             IrrValue <- NULL
+            PA.assemblages <- assemblages
+            PA.assemblages[PA.assemblages > 0] <- 1
+            
             for (x1 in 1:ncol(W))
             {
-              IrrValue <- cbind(IrrValue,
-                                apply(assemblages, 2, function(x, Weights, wmax, wmin)
-                                {
-                                  if(sum(x) == 0)
-                                  {
-                                    0
-                                  } else
-                                  {
-                                    (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
-                                  }
-                                }, Weights = W[, x1], wmax = Wmax[x1], wmin = Wmin[x1])
-                                )
+              if(abundance)
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(assemblages, 2, function(x, Weights, wmin, wmax)
+                {
+                  if(sum(x) == 0)
+                  {
+                    0
+                  } else
+                  {
+                    (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                  }
+                }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with abundance
+                )
+              } else
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(PA.assemblages, 2, function(x, pa, Weights, wmin, wmax)
+                {
+                  if(sum(x) == 0)
+                  {
+                    0
+                  } else
+                  {
+                    (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                  }
+                }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with presence-absence data   
+                )
+              }
               colnames(IrrValue)[ncol(IrrValue)] <- paste("Irr_", colnames(W)[x1], sep ="")
+              
             }
             IrrValue <- cbind(IrrValue,
-                              Richness = apply(assemblages, 2, sum))
+                              Richness = apply(PA.assemblages, 2, sum))
             return(IrrValue)
           }
           )
@@ -434,24 +502,45 @@ setMethod("Irr",
               W <- W[match(rownames(assemblages), rownames(W)), ]
             }
             IrrValue <- NULL
+            PA.assemblages <- assemblages
+            PA.assemblages[PA.assemblages > 0] <- 1
+            
             for (x1 in 1:ncol(W))
             {
-              IrrValue <- cbind(IrrValue,
-                                apply(assemblages, 2, function(x, Weights, wmax, wmin)
-                                {
-                                  if(sum(x) == 0)
+              if(abundance)
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(assemblages, 2, function(x, Weights, wmin, wmax)
                                   {
-                                    0
-                                  } else
+                                    if(sum(x) == 0)
+                                    {
+                                      0
+                                    } else
+                                    {
+                                      (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                                    }
+                                  }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with abundance
+                )
+              } else
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(PA.assemblages, 2, function(x, pa, Weights, wmin, wmax)
                                   {
-                                    (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
-                                  }
-                                }, Weights = W[, x1], wmax = Wmax[x1], wmin = Wmin[x1])
-              )
+                                    if(sum(x) == 0)
+                                    {
+                                      0
+                                    } else
+                                    {
+                                      (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                                    }
+                                  }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with presence-absence data   
+                )
+              }
               colnames(IrrValue)[ncol(IrrValue)] <- paste("Irr_", colnames(W)[x1], sep ="")
+              
             }
             IrrValue <- cbind(IrrValue,
-                              Richness = apply(assemblages, 2, sum))
+                              Richness = apply(PA.assemblages, 2, sum))
             return(IrrValue)
           }
           )
@@ -471,18 +560,37 @@ setMethod("Irr",
               W <- W[match(rownames(assemblages), names(W))]
             }
             
-            IrrValue <- apply(assemblages, 2, function(x, Weights, wmin, wmax)
+            PA.assemblages <- assemblages
+            PA.assemblages[PA.assemblages > 0] <- 1
+            
+            if(abundance)
             {
-              if(sum(x) == 0)
+              IrrValue <- apply(assemblages, 2, function(x, Weights, wmin, wmax)
               {
-                0
-              } else
+                if(sum(x) == 0)
+                {
+                  0
+                } else
+                {
+                  (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                }
+              }, Weights = W, wmin = Wmin, wmax = Wmax) # Formula with abundance
+            } else
+            {
+              IrrValue <- apply(PA.assemblages, 2, function(x, pa, Weights, wmin, wmax)
               {
-                (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
-              }
-            }, Weights = W, wmin = Wmin, wmax = Wmax)
+                if(sum(x) == 0)
+                {
+                  0
+                } else
+                {
+                  (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                }
+              }, Weights = W, wmin = Wmin, wmax = Wmax) # Formula with presence-absence data       
+            }
+            
             IrrValue <- cbind(IrrValue,
-                              Richness = apply(assemblages, 2, sum))
+                              Richness = apply(PA.assemblages, 2, sum))
             return(IrrValue)
           }
 )
@@ -502,24 +610,45 @@ setMethod("Irr",
               W <- W[match(rownames(assemblages), rownames(W)), ]
             }
             IrrValue <- NULL
+            PA.assemblages <- assemblages
+            PA.assemblages[PA.assemblages > 0] <- 1
+            
             for (x1 in 1:ncol(W))
             {
-              IrrValue <- cbind(IrrValue,
-                                apply(assemblages, 2, function(x, Weights, wmax, wmin)
-                                {
-                                  if(sum(x) == 0)
+              if(abundance)
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(assemblages, 2, function(x, Weights, wmin, wmax)
                                   {
-                                    0
-                                  } else
+                                    if(sum(x) == 0)
+                                    {
+                                      0
+                                    } else
+                                    {
+                                      (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                                    }
+                                  }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with abundance
+                )
+              } else
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(PA.assemblages, 2, function(x, pa, Weights, wmin, wmax)
                                   {
-                                    (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
-                                  }
-                                }, Weights = W[, x1], wmax = Wmax[x1], wmin = Wmin[x1])
-              )
+                                    if(sum(x) == 0)
+                                    {
+                                      0
+                                    } else
+                                    {
+                                      (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                                    }
+                                  }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with presence-absence data   
+                )
+              }
               colnames(IrrValue)[ncol(IrrValue)] <- paste("Irr_", colnames(W)[x1], sep ="")
+              
             }
             IrrValue <- cbind(IrrValue,
-                              Richness = apply(assemblages, 2, sum))
+                              Richness = apply(PA.assemblages, 2, sum))
             return(IrrValue)
           }
 )
@@ -540,24 +669,45 @@ setMethod("Irr",
               W <- W[match(rownames(assemblages), rownames(W)), ]
             }
             IrrValue <- NULL
+            PA.assemblages <- assemblages
+            PA.assemblages[PA.assemblages > 0] <- 1
+            
             for (x1 in 1:ncol(W))
             {
-              IrrValue <- cbind(IrrValue,
-                                apply(assemblages, 2, function(x, Weights, wmax, wmin)
-                                {
-                                  if(sum(x) == 0)
+              if(abundance)
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(assemblages, 2, function(x, Weights, wmin, wmax)
                                   {
-                                    0
-                                  } else
+                                    if(sum(x) == 0)
+                                    {
+                                      0
+                                    } else
+                                    {
+                                      (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                                    }
+                                  }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with abundance
+                )
+              } else
+              {
+                IrrValue <- cbind(IrrValue,
+                                  apply(PA.assemblages, 2, function(x, pa, Weights, wmin, wmax)
                                   {
-                                    (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
-                                  }
-                                }, Weights = W[, x1], wmax = Wmax[x1], wmin = Wmin[x1])
-              )
+                                    if(sum(x) == 0)
+                                    {
+                                      0
+                                    } else
+                                    {
+                                      (((sum(x * Weights) / sum(x)) - wmin) / (wmax - wmin))
+                                    }
+                                  }, Weights = W[, x1], wmin = Wmin[x1], wmax = Wmax[x1]) # Formula with presence-absence data   
+                )
+              }
               colnames(IrrValue)[ncol(IrrValue)] <- paste("Irr_", colnames(W)[x1], sep ="")
+              
             }
             IrrValue <- cbind(IrrValue,
-                              Richness = apply(assemblages, 2, sum))
+                              Richness = apply(PA.assemblages, 2, sum))
             return(IrrValue)
           }
 )
