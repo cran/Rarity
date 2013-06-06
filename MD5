@@ -1,6 +1,11 @@
-730c6d8f3a357f742f5d37bf7d3259ee *DESCRIPTION
+066be08f44ac1ccb2d269161495286a6 *DESCRIPTION
 b91055169bd4c672254137dc6b53abdc *NAMESPACE
-3f8d2a54088f1abd1df6ca1eac4ecb7e *R/funcRarity.R
-46d6d9caf36e54e03d36f0e36ab948c4 *man/Irr.Rd
-c6d471f9e624c4336ffd9fcf95ad1d2a *man/Rarity-package.Rd
-93c8df1a2652c952c28729ed395b61c9 *man/rWeights.Rd
+0b638f8d211650c951ccd697807d866f *R/correlation_plots.R
+434250c9813a8676ec973d9f6ae14322 *R/rarity_indices.R
+45ccd53f299c65b8e9f4a765e2e57ca2 *R/rarity_weights.R
+369e5576c2011b49a476c695050078c5 *data/spid.occ.rda
+661e319a66e5ece9357ff4d99c54f38d *man/Irr.Rd
+177fdaeffaa05931db4043e03dc99fa8 *man/Rarity-package.Rd
+6671261129afe389ee49ea033b2733ec *man/corPlot.Rd
+565f4457958a068e40fc55cc93065f31 *man/rWeights.Rd
+bb5868fd89b8f66ea3a8da131740630c *man/spid.occ.Rd

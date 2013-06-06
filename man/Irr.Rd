@@ -24,7 +24,7 @@ Irr(assemblages, W, abundance = F, Wmin = min(W), Wmax = max(W))
 vector, matrix or data.frame. Data of the assemblage(s) of species for which the Index will be calculated. If matrix or data.frame, species are in rows and assemblages are in columns (see details).
 }
   \item{W}{
-vector, matrix or data.frame. Rarity weights of the species. If matrix or data.frame, species are in rows (see details).
+vector, matrix or data.frame. Rarity weights of the species. If matrix or data.frame, species are in rows (see details). 
 }
   \item{abundance}{
 logical. If \code{TRUE}, then abundance values in \code{assemblages} are taken into account to calculate the Index of Relative Rarity.
@@ -42,6 +42,8 @@ decimal or vector. Maximum weight(s)
 All the species of \code{assemblages} must be contained in \code{W}
 
 \code{W} can contain a single vector of rarity weights, or a matrix or a data.frame of rarity weights (e.g. to calculate different Indices of Relative Rarity for different scales). If \code{W} is a vector, values must be named with species names. If \code{W} is a matrix or a data.frame, then species are in rows and each column contains rarity weights. Rows must be named with species names.
+
+If the input of \code{rWeights} is directly entered, then columns \code{Q} (occurrence) and \code{R} (rarity status) will be dropped.
 }
 \value{
 A data.frame containing the Indices of Relative Rarity and the species richness of the assemblage(s).
@@ -61,38 +63,42 @@ Boris Leroy leroy.boris@gmail.com
 }
 \examples{
 # Input rarity weights
-# Example of a single scale dataset
-rarity.weights <- runif(50)
-names(rarity.weights) <- paste("sp", 1:50)
+data(spid.occ)
 
-# assemblage matrix
+# Example of a single scale dataset
+regional.occ <- spid.occ$occurMA
+names(regional.occ) <- rownames(spid.occ)
+head(regional.occ)
+
+# Preparation of rarity weights
+rarity.weights <- rWeights(regional.occ)
+
+# Generation of an assemblage matrix
 assemblages.matrix <- cbind(assemblage.1 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.2 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.3 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.4 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.5 = sample(c(0, 1), 50, replace = TRUE))
-rownames(assemblages.matrix) <- paste("sp", 1:50) # The order of row.names can
-                                # be different between weights and assemblages
+# Random attribution of names to the sampled species
+rownames(assemblages.matrix) <- sample(names(regional.occ), 50, replace = FALSE)
+head(assemblages.matrix)
 
 # Calculation of Irr
 Irr(assemblages.matrix, rarity.weights)
 
 
 # Example of a multi scale dataset
-# 3 columns: weights of scale 1, weights of scale 2, and multiscale weights
-rarity.weights <- cbind(scale1 = runif(50),
-                        scale2 = runif(50),
-                        multiscale = runif(50))
-rownames(rarity.weights) <- paste("sp", 1:50)
+rarity.weights <- rWeights(spid.occ, extended = TRUE)
+head(rarity.weights)
 
-# assemblage matrix
+# Generation of an assemblage matrix
 assemblages.matrix <- cbind(assemblage.1 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.2 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.3 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.4 = sample(c(0, 1), 50, replace = TRUE),
                             assemblage.5 = sample(c(0, 1), 50, replace = TRUE))
-rownames(assemblages.matrix) <- paste("sp", 1:50) # The order of row.names can 
-                                # be different between weights and assemblages
+rownames(assemblages.matrix) <- sample(names(regional.occ), 50, replace = FALSE)
+head(assemblages.matrix)
 
 # Calculation of Irr
 Irr(assemblages.matrix, rarity.weights)

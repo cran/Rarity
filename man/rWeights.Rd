@@ -13,7 +13,7 @@ Calculate rarity weights for a single scale or for multiple scales on the basis 
 \usage{
 rWeights(occData, Qmax = max(occData), Qmin = min(occData), 
          wMethods = "W", rCutoff = "Gaston", normalized = T, 
-         assemblages, extended = F)
+         assemblages, extended = F, rounding = 3)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -40,6 +40,9 @@ matrix or data.frame. Set of assemblages of species to calculate the rarity cuto
 }
   \item{extended}{
 TRUE or FALSE. Useful in case of multiple scales only. If TRUE, then weights will be given for every input scale in addition to multiscale weights. If FALSE, then only multiscale weights will be provided. 
+}
+  \item{rounding}{
+An integer or FALSE. If an integer is provided, then the values of weights will be rounded according to this value. If FALSE, weights will not be rounded.
 }
 }
 \details{
@@ -78,6 +81,8 @@ A data.frame containing the results : species occurrences, rarity statuses and r
 -  If \code{occData} is a vector (single scale weights): A data.frame with 3 columns : \code{Q} (species occurrence), \code{R} (species rarity status), \code{W}, (species rarity weight)
 
 -	If \code{occData} is matrix or a data.frame (multiscale rarity weights): A data.frame with \emph{n} columns \code{Q} (species occurrences), \emph{n} columns \code{R} (species rarity statuses), one (if \code{extended = F}) or \emph{n} + 1 (if \code{extended = T}) columns \code{W} (species rarity weights) where \emph{n} is the number of scales (number of columns of \code{occData})
+
+By default, weights are rounded to 3 digits, which should be sufficient in most cases. Another number of digits can also be chosen; or simply changing \code{rounding} to \code{FALSE} will remove the rounding.
 }
 \references{
 Leroy B., Petillon J., Gallon R., Canard A., & Ysnel F. (2012) Improving occurrence-based rarity metrics in conservation studies by including multiple rarity cut-off points. \emph{Insect Conservation and Diversity}, \bold{5}, 159-168.
@@ -88,52 +93,48 @@ Leroy B., Canard A., & Ysnel F. In Press. Integrating multiple scales in rarity 
 \author{
 Boris Leroy leroy.boris@gmail.com
 }
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{Irr}}
 }
 \examples{
 # 1. Single scale rarity weights
-# Example with occurrences of species ranging from 1 to 100
-# where 25percent of the species have occurrences lower than 7
-occurrences <- c(sample(seq(1, 6), 25, replace = TRUE), 
-                 sample(seq(7, 100), 75, replace = TRUE))
-names(occurrences) <- paste("sp", 1:100)
-occurrences
-# Calculation of rarity weights
-rWeights(occurrences, rCutoff = "Gaston")
-rWeights(occurrences, rCutoff = 0.1)
-rWeights(occurrences, wMethods = "invQ")
-rWeights(occurrences, wMethods = c("W", "invQ"))
+data(spid.occ)
+head(spid.occ)
+
+regional.occ <- spid.occ$occurMA
+names(regional.occ) <- rownames(spid.occ)
+head(regional.occ)
+
+# Calculation of rarity weights at a single scale:
+rWeights(regional.occ, rCutoff = "Gaston")
+rWeights(regional.occ, rCutoff = 0.1)
+rWeights(regional.occ, wMethods = "invQ")
+rWeights(regional.occ, wMethods = c("W", "invQ"))
 
 # Calculation of rarity weights with the method of Leroy
-assemblages.matrix <- cbind(assemblage.1 = sample(c(0, 1), 100, replace = TRUE),
-                            assemblage.2 = sample(c(0, 1), 100, replace = TRUE),
-                            assemblage.3 = sample(c(0, 1), 100, replace = TRUE),
-                            assemblage.4 = sample(c(0, 1), 100, replace = TRUE),
-                            assemblage.5 = sample(c(0, 1), 100, replace = TRUE))
-rownames(assemblages.matrix) <- paste("sp", 1:100) # Rownames of assemblages.matrix must 
+# Creating a fictive assemblage matrix of 5 assemblages
+# Warning: this is to provide an example of how the function works!
+# The correct use of this method requires a matrix of actually sampled species.
+assemblages.matrix <- cbind(assemblage.1 = sample(c(0, 1), 708, replace = TRUE),
+                            assemblage.2 = sample(c(0, 1), 708, replace = TRUE),
+                            assemblage.3 = sample(c(0, 1), 708, replace = TRUE),
+                            assemblage.4 = sample(c(0, 1), 708, replace = TRUE),
+                            assemblage.5 = sample(c(0, 1), 708, replace = TRUE))
+rownames(assemblages.matrix) <- names(regional.occ) # Rownames of assemblages.matrix must 
                                                  # correspond to rownames in occurrences
-rWeights(occurrences, wMethods = "W", rCutoff = "Leroy", assemblages = assemblages.matrix)
+head(assemblages.matrix)
+                                          
+rWeights(regional.occ, wMethods = "W", rCutoff = "Leroy", assemblages = assemblages.matrix)
 
 # 2. Multiscale rarity weights
-# Example with occurrences of species ranging from 1 to 100 in a first dataset
-# where 25percent of the species have occurrences lower than 7
-# and ranging from 3 to 80 in a second dataset
-# where 25 percent of the species have occurrences lower than 20
-scale1 <- c(sample(seq(1, 6), 25, replace = TRUE), sample(seq(7, 100), 75, replace = TRUE))
-scale2 <- c(sample(seq(3, 20), 25, replace = TRUE), sample(seq(21, 80), 75, replace = TRUE))
-dataset <- cbind(S1 = scale1, 
-                 S2 = scale2[sample(1:100, 100, replace = FALSE)]) # random attribution of 
-                                                                  # occurrences to species
-rownames(dataset) <- paste("sp", 1:100)
-head(dataset)
+data(spid.occ)
+head(spid.occ)
 
-rWeights(dataset, wMethods = "W", rCutoff = "Gaston")
-rWeights(dataset, wMethods = "W", rCutoff = "Gaston", extended = TRUE)
-rWeights(dataset, wMethods = c("W", "invQ"), rCutoff = "Gaston", extended = TRUE)
-rWeights(dataset, wMethods = c("W", "invQ"), rCutoff = "Leroy", 
+rWeights(spid.occ, wMethods = "W", rCutoff = "Gaston")
+rWeights(spid.occ, wMethods = "W", rCutoff = "Gaston", extended = TRUE)
+rWeights(spid.occ, wMethods = c("W", "invQ"), rCutoff = "Gaston", extended = TRUE)
+rWeights(spid.occ, wMethods = c("W", "invQ"), rCutoff = "Leroy", 
          assemblages = assemblages.matrix, extended = TRUE) # Provided that you have 
                                              # created "assemblages.matrix" as above
 }

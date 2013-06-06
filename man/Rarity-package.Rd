@@ -1,5 +1,6 @@
 \name{Rarity-package}
 \alias{Rarity-package}
+\alias{Rarity}
 \docType{package}
 \title{
 A package to calculate rarity indices for species and assemblages of species for conservation studies
@@ -13,8 +14,8 @@ The methods developped in this package are based on occurrence (presence-absence
 \tabular{ll}{
 Package: \tab Rarity\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2012-11-19\cr
+Version: \tab 1.2\cr
+Date: \tab 2013-06-06\cr
 License: \tab  GPL (>=2.0)\cr
 Depends: \tab methods\cr
 }
@@ -37,18 +38,23 @@ Leroy B., Canard A., & Ysnel F. In Press. Integrating multiple scales in rarity 
 \keyword{ package }
 
 \examples{
-# Creation of a sample of occurrence dataset (100 species, 40 sites)
-sample.dataset <- matrix(nr = 100, nc = 40,
-                         sample(c(0, 1), 4000, replace = TRUE),
-                         dimnames = list(paste("sp", 1:100, sep = ""),
-                                         paste("site", 1:40, sep = "")))
-
-# Calculation of species occurrences
-occurrences <- apply(sample.dataset, 1, sum)
+# Example dataset: occurrences of spider species at two different scales
+data(spid.occ)
+head(spid.occ)
 
 # Calculation of rarity weights
-rarity.weights <- rWeights(occurrences, rCutoff = "Gaston")
+rarity.weights <- rWeights(occData = spid.occ, rCutoff = "Gaston")
+
+# Generation of a random assemblage matrix
+assemblages.matrix <- cbind(assemblage.1 = sample(c(0, 1), 50, replace = TRUE),
+                            assemblage.2 = sample(c(0, 1), 50, replace = TRUE),
+                            assemblage.3 = sample(c(0, 1), 50, replace = TRUE),
+                            assemblage.4 = sample(c(0, 1), 50, replace = TRUE),
+                            assemblage.5 = sample(c(0, 1), 50, replace = TRUE))
+# Random attribution of species names
+rownames(assemblages.matrix) <- sample(rownames(spid.occ), 50, replace = FALSE)
+head(assemblages.matrix)
 
 # Calculation of rarity indices of assemblages
-Irr(sample.dataset, rarity.weights$W)
+Irr(assemblages = assemblages.matrix, W = rarity.weights)
 }
