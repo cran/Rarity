@@ -97,7 +97,10 @@ corPlot <- function(df, method = "spearman", digits = 2, na.action = "keep", tie
             if (j == 1) axis(2, at = c(0, round(nrow(df)/2, 0), nrow(df)), las = 1)
           } else if (method == "pearson")
           {
-            plot(df[, i] ~ df[, j], xaxt = "n", yaxt = "n", xlim = c(0, max(df[, j], na.rm = T)), ylim = c(0, max(df[, i], na.rm = T)), 
+            plot(df[, i] ~ df[, j], xaxt = "n", yaxt = "n", xlim = c(floor(min(df[, j], na.rm = T)), 
+                                                                     ceiling(max(df[, j], na.rm = T))), 
+                 ylim = c(floor(min(df[, i], na.rm = T)),
+                          ceiling(max(df[, i], na.rm = T))), 
                  xlab = "", ylab = "", ...)
             if (i == ncol(df)) axis(1, las = 1)
             if (j == 1) axis(2, las = 1)
