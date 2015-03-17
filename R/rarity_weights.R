@@ -31,7 +31,7 @@ setMethod("rWeights",
               if(round(rCutoff * Qmax, 10) == Qmin)
               {
                 rCutoff <- rCutoff + .000000001
-                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin.")
+                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin (Qmin + .000000001).")
               }
               cat("Rarity cut-off point:", rCutoff, "/", rCutoff * Qmax, "\n")
             } else if (rCutoff == "Leroy")
@@ -70,7 +70,7 @@ setMethod("rWeights",
               if(round(rCutoff * Qmax, 10) == Qmin)
               {
                 rCutoff <- rCutoff + .000000001
-                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin.")
+                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin (Qmin + .000000001).")
               }
               cat("Rarity cut-off point:", rCutoff, "/", rCutoff * Qmax, "\n")
             } else if (rCutoff == "Gaston")
@@ -79,7 +79,7 @@ setMethod("rWeights",
               if(round(rCutoff * Qmax, 10) == Qmin)
               {
                 rCutoff <- rCutoff + .000000001
-                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin.")
+                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin (Qmin + .000000001).")
               }
               cat("Rarity cut-off point:", rCutoff, "/", rCutoff * Qmax, "\n")
             } else stop("Please specify a correct cutoff (either a value or a correct method)")
@@ -118,6 +118,11 @@ setMethod("rWeights",
                 spWeights[, "oldW"] <- spWeights[, "oldW"] / exp( -(((Qmin / Qmax) * n + 1)^2) )
               }
             }
+            if(any(c("oldW", "W") %in% wMethods))
+            {
+              spWeights <- cbind(spWeights,
+                                 cut.off = rCutoff)
+            }
             if(!!rounding)
             {
               if(!is.numeric(rounding))
@@ -125,7 +130,7 @@ setMethod("rWeights",
                 stop("Either provide an integer value (if you want rounding) or FALSE (if you do not want rounding) for argument 'rounding'")
               }
               rounding <- as.integer(rounding)
-              spWeights[, which(!(colnames(spWeights) %in% c("Q", "R")))] <- round(spWeights[, which(!(colnames(spWeights) %in% c("Q", "R")))], digits = rounding)                                                                
+              spWeights[, which(!(colnames(spWeights) %in% c("Q", "R", "cut.off")))] <- round(spWeights[, which(!(colnames(spWeights) %in% c("Q", "R", "cut.off")))], digits = rounding)                                                                
             }
             spWeights <- as.data.frame(spWeights)
             spWeights
@@ -149,7 +154,7 @@ setMethod("rWeights",
               if(any(round(rCutoff * Qmax, 10) == Qmin))
               {
                 rCutoff[which(round(rCutoff * Qmax, 10) == Qmin)] <- rCutoff[which(round(rCutoff * Qmax, 10) == Qmin)]  + .000000001
-                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin.")
+                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin (Qmin + .000000001).")
               }
               cat("Rarity cut-off points:\n", paste(colnames(occData), rCutoff, "/", rCutoff * Qmax, collapse = "\n ", sep =" "), "\n")
             } else if (rCutoff == "Leroy")
@@ -195,7 +200,7 @@ setMethod("rWeights",
               if(any(round(rCutoff * Qmax, 10) == Qmin))
               {
                 rCutoff[which(round(rCutoff * Qmax, 10) == Qmin)] <- rCutoff[which(round(rCutoff * Qmax, 10) == Qmin)]  + .000000001
-                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin.")
+                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin (Qmin + .000000001).")
               }
               cat("Rarity cut-off points:\n", paste(colnames(occData), rCutoff, "/", rCutoff * Qmax, collapse = "\n ", sep =" "), "\n")
               
@@ -205,7 +210,7 @@ setMethod("rWeights",
               if(any(round(rCutoff * Qmax, 10) == Qmin))
               {
                 rCutoff[which(round(rCutoff * Qmax, 10) == Qmin)] <- rCutoff[which(round(rCutoff * Qmax, 10) == Qmin)]  + .000000001
-                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin.")
+                warning("The cutoff cannot be equal to Qmin for mathematical reasons. Setting a cutoff slightly above Qmin (Qmin + .000000001).")
               }
               cat("Rarity cut-off points:\n", paste(colnames(occData), rCutoff, "/", rCutoff * Qmax, collapse = "\n ", sep =" "), "\n")
             } else stop("Please specify a correct cutoff (either a value or a correct method)")
@@ -276,6 +281,18 @@ setMethod("rWeights",
                 colnames(spWeights)[ncol(spWeights)] <- wMethods
               }
             }
+            if(any(c("oldW", "W") %in% wMethods))
+            {
+              for(x1 in 1:ncol(occData))
+              {
+                spWeights <- cbind(spWeights,
+                                   rCutoff[x1])
+                colnames(spWeights)[ncol(spWeights)] <- paste("cut.off", x1, sep ="")
+              }
+              
+              spWeights <- cbind(spWeights,
+                                 cut.off = rCutoff)
+            }
             if(!!rounding)
             {
               if(!is.numeric(rounding))
@@ -283,7 +300,14 @@ setMethod("rWeights",
                 stop("Either provide an integer value (if you want rounding) or FALSE (if you do not want rounding) for argument 'rounding'")
               }
               rounding <- as.integer(rounding)
-              spWeights[, which(!(colnames(spWeights) %in% c("Q", "R")))] <- round(spWeights[, which(!(colnames(spWeights) %in% c("Q", "R")))], digits = rounding)
+              spWeights[, which(!(colnames(spWeights) %in% c("Q", "R", "cut.off", 
+                                                             paste("Q", 1:1000, sep = ""), 
+                                                             paste("R", 1:1000, sep = ""),  
+                                                             paste("cut.off", 1:1000, sep = ""))))] <- 
+                round(spWeights[, which(!(colnames(spWeights) %in% c("Q", "R", "cut.off", 
+                                                                     paste("Q", 1:1000, sep = ""), 
+                                                                     paste("R", 1:1000, sep = ""),  
+                                                                     paste("cut.off", 1:1000, sep = ""))))], digits = rounding)
             }
             spWeights <- as.data.frame(spWeights)
             spWeights

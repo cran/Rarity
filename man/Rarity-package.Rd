@@ -14,8 +14,8 @@ The methods developped in this package are based on occurrence (presence-absence
 \tabular{ll}{
 Package: \tab Rarity\cr
 Type: \tab Package\cr
-Version: \tab 1.2-1\cr
-Date: \tab 2013-06-10\cr
+Version: \tab 1.3\cr
+Date: \tab 2013-10-28\cr
 License: \tab  GPL (>=2.0)\cr
 Depends: \tab methods\cr
 }
@@ -33,7 +33,8 @@ Maintainer: Boris Leroy <leroy.boris@gmail.com>
 \references{
 Leroy B., Petillon J., Gallon R., Canard A., & Ysnel F. (2012) Improving occurrence-based rarity metrics in conservation studies by including multiple rarity cut-off points. \emph{Insect Conservation and Diversity}, \bold{5}, 159-168.
 
-Leroy B., Canard A., & Ysnel F. In Press. Integrating multiple scales in rarity assessments of invertebrate taxa. \emph{Diversity and Distributions}}
+Leroy B., Canard A., & Ysnel F. In Press. Integrating multiple scales in rarity assessments of invertebrate taxa. \emph{Diversity and Distributions}, \bold{19}, 794-803.
+}
 
 \keyword{ package }
 

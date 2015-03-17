@@ -27,6 +27,8 @@ Canard, A. (2005) Catalogue of spider species from Europe and the Mediterranean 
 Petillon, J., Courtial, C., Canard, A. & Ysnel, F. (2007a) First assessment of spider rarity in Western France. \emph{Revista iberica de aracnologia}, \bold{15}, 105-113.
 
 Ysnel, F., Petillon, J., Gerard, E. & Canard, A. (2008) Assessing the conservation value of the spider fauna across the West Palearctic area. \emph{Journal of Arachnology}, \bold{36}, 457-463.
+
+Leroy B., Canard A., & Ysnel F. In Press. Integrating multiple scales in rarity assessments of invertebrate taxa. \emph{Diversity and Distributions}, \bold{19}, 794-803.
 }
 \examples{
 data(spid.occ)
